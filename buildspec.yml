@@ -1,0 +1,22 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.13
+    commands:
+      - pip install aws-sam-cli
+      - echo 'DONE'
+  pre_build:
+    commands:
+      - echo 'DONE'
+  build:
+    commands:
+      - sam build
+      - sam package --s3-bucket $ARTIFACTS_BUCKET --output-template-file packaged-template.yaml
+      - echo 'DONE'
+  post_build:
+    commands:
+      - echo 'DONE'
+artifacts:
+  files:
+    - packaged-template.yaml
