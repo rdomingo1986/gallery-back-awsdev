@@ -5,18 +5,22 @@ Description: >
 
   Sample SAM Template for DemoBedRockPY
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
-
+    Architectures:
+      - x86_64
+    Runtime: python3.13
+    Layers:
+      - !Ref DependenciesLayer
     Tracing: Active
-    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
       LogFormat: JSON
-  Api:
-    TracingEnabled: true
+
 Resources:
+  ImagesBucket:
+    Type: AWS::S3::Bucket
+
   DependenciesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -25,38 +29,40 @@ Resources:
       ContentUri: layers/dependencies/
       CompatibleRuntimes:
         - python3.13
-      RetentionPolicy: Retain
+      RetentionPolicy: Delete
     Metadata:
       BuildMethod: python3.13
 
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  RegisterImageMetadataFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/hello_world/
+      CodeUri: src/register_image_metadata/
       Handler: app.lambda_handler
-      Runtime: python3.13
-      Architectures:
-      - x86_64
-      Layers:
-        - !Ref DependenciesLayer
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref ImageMetadataTable
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ImageMetadataTable
       Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        S3Event:
+          Type: S3
           Properties:
-            Path: /hello
-            Method: get
+            Bucket: !Ref ImagesBucket
+            Events: s3:ObjectCreated:*
 
-Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World 
-      function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: Hello World Lambda Function ARN
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  ImageMetadataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: UserId
+          AttributeType: S
+        - AttributeName: ImageId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: UserId
+          KeyType: HASH
+        - AttributeName: ImageId
+          KeyType: RANGE
