@@ -1,7 +1,7 @@
-import json
 import logging
 import boto3
 import os
+from api_utils import api_response
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -30,35 +30,11 @@ def lambda_handler(event, context):
         
         logger.info(f"Image metadata deleted for user {user_id}, image {image_id}")
         
-        return {
-            "statusCode": 200,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "DELETE,OPTIONS",
-                "Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Requested-With'"
-            },
-            "body": json.dumps({"message": "Image deleted successfully"})
-        }
+        return api_response(200, "Image deleted successfully")
         
     except KeyError as e:
         logger.error(f"Missing required parameter: {str(e)}")
-        return {
-            "statusCode": 400,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "DELETE,OPTIONS",
-                "Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Requested-With'"
-            },
-            "body": json.dumps({"error": f"Missing required parameter: {str(e)}"})
-        }
+        return api_response(400, f"Missing required parameter: {str(e)}")
     except Exception as e:
         logger.error(f"Error deleting image metadata: {str(e)}")
-        return {
-            "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "DELETE,OPTIONS",
-                "Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Requested-With'"
-            },
-            "body": json.dumps({"error": "Internal server error"})
-        }
+        return api_response(500, "Internal server error")
