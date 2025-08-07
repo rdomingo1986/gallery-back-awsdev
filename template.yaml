@@ -16,8 +16,49 @@ Globals:
     Tracing: Active
     LoggingConfig:
       LogFormat: JSON
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Requested-With'"
+      AllowOrigin: "'*'"
+    TracingEnabled: true
 
 Resources:
+  GalleryApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt GalleryUserPool.Arn
+
+  GalleryUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: GalleryUserPool
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+          RequireUppercase: false
+          RequireLowercase: false
+          RequireNumbers: false
+          RequireSymbols: false
+      AutoVerifiedAttributes:
+        - email
+
+  GalleryUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref GalleryUserPool
+      ClientName: GalleryWebClient
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+
   ImagesBucket:
     Type: AWS::S3::Bucket
 
@@ -51,6 +92,27 @@ Resources:
           Properties:
             Bucket: !Ref ImagesBucket
             Events: s3:ObjectCreated:*
+  
+  DeleteImageMetadataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/delete_image_metadata/
+      Handler: app.lambda_handler
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref ImageMetadataTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ImageMetadataTable
+      Events:
+        DeleteImageApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GalleryApi
+            Path: /images/{id}
+            Method: delete
+            Auth:
+              Authorizer: CognitoAuthorizer
 
   ImageMetadataTable:
     Type: AWS::DynamoDB::Table
@@ -66,3 +128,16 @@ Resources:
           KeyType: HASH
         - AttributeName: ImageId
           KeyType: RANGE
+
+Outputs:
+  GalleryApiUrl:
+    Description: "API Gateway endpoint URL for Gallery API"
+    Value: !Sub "https://${GalleryApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  
+  CreateUserCommand:
+    Description: "AWS CLI command to create a user without confirmation"
+    Value: !Sub "aws cognito-idp admin-create-user --user-pool-id ${GalleryUserPool} --username <USERNAME> --message-action SUPPRESS --temporary-password <TEMP_PASSWORD>"
+  
+  SetPermanentPasswordCommand:
+    Description: "AWS CLI command to set permanent password for user"
+    Value: !Sub "aws cognito-idp admin-set-user-password --user-pool-id ${GalleryUserPool} --username <USERNAME> --password <PERMANENT_PASSWORD> --permanent"
