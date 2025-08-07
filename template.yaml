@@ -114,6 +114,27 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
+  ListarImagesMetadataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/listar_images_metadata/
+      Handler: app.lambda_handler
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref ImageMetadataTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ImageMetadataTable
+      Events:
+        DeleteImageApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GalleryApi
+            Path: /images
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+
   ImageMetadataTable:
     Type: AWS::DynamoDB::Table
     Properties:
