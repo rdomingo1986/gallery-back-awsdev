@@ -177,6 +177,16 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
+  EliminarImageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/eliminar_image/
+      Handler: app.lambda_handler
+      Environment: {}
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref ImagesBucket
+
   ImageMetadataTable:
     Type: AWS::DynamoDB::Table
     Properties:
