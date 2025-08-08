@@ -186,6 +186,15 @@ Resources:
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref ImagesBucket
+      Events:
+        DynamoDBStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt ImageMetadataTable.StreamArn
+            StartingPosition: TRIM_HORIZON
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"eventName": ["REMOVE"]}'
 
   ImageMetadataTable:
     Type: AWS::DynamoDB::Table
@@ -201,6 +210,8 @@ Resources:
           KeyType: HASH
         - AttributeName: ImageId
           KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: OLD_IMAGE
 
 Outputs:
   GalleryApiUrl:
