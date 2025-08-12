@@ -14,6 +14,8 @@ Globals:
     Environment:
       Variables:
         DYNAMODB_TABLE: !Ref ImageMetadataTable
+        ENV: CLOUD
+        DYNAMODB_LOCAL: ImageMetadataTable
     Layers:
       - !Ref DependenciesLayer
     Tracing: Active
@@ -82,9 +84,6 @@ Resources:
     Properties:
       CodeUri: src/register_image_metadata/
       Handler: app.lambda_handler
-      Environment:
-        Variables:
-          DYNAMODB_TABLE: !Ref ImageMetadataTable
       Policies:
         - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
         - DynamoDBCrudPolicy:
@@ -101,9 +100,6 @@ Resources:
     Properties:
       CodeUri: src/delete_image_metadata/
       Handler: app.lambda_handler
-      Environment:
-        Variables:
-          DYNAMODB_TABLE: !Ref ImageMetadataTable
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ImageMetadataTable
@@ -122,9 +118,6 @@ Resources:
     Properties:
       CodeUri: src/listar_images_metadata/
       Handler: app.lambda_handler
-      Environment:
-        Variables:
-          DYNAMODB_TABLE: !Ref ImageMetadataTable
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ImageMetadataTable
@@ -143,9 +136,6 @@ Resources:
     Properties:
       CodeUri: src/obtener_image_metadata/
       Handler: app.lambda_handler
-      Environment:
-        Variables:
-          DYNAMODB_TABLE: !Ref ImageMetadataTable
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ImageMetadataTable
@@ -164,9 +154,6 @@ Resources:
     Properties:
       CodeUri: src/editar_image_metadata/
       Handler: app.lambda_handler
-      Environment:
-        Variables:
-          DYNAMODB_TABLE: !Ref ImageMetadataTable
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ImageMetadataTable
