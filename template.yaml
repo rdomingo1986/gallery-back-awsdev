@@ -18,7 +18,7 @@ Globals:
       LogFormat: JSON
   Api:
     Cors:
-      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      AllowMethods: "'GET,PUT,DELETE,OPTIONS'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Requested-With'"
       AllowOrigin: "'*'"
     TracingEnabled: true
