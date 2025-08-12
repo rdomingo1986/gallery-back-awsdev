@@ -9,12 +9,13 @@ phases:
   pre_build:
     commands:
       - cd layers/dependencies
-      - pip install -r requirements.txt -t python/
+      - mkdir -p python
+      - pip install -r requirements.txt -t python/ --upgrade
       - cd ../..
   build:
     commands:
-      - sam build
-      - sam package --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-1jzba95imlkz8 --output-template-file packaged.yml
+      - sam build --use-container
+      - sam package --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-1jzba95imlkz8 --output-template-file packaged.yaml
 artifacts:
   files:
-    - packaged.yml
+    - packaged.yaml
