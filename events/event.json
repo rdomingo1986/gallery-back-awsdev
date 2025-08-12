@@ -1,14 +1,14 @@
 {
-  "body": "{\"message\": \"hello world\"}",
-  "resource": "/hello",
-  "path": "/hello",
+  "body": "{\"Description\": \"hello world!!!\"}",
+  "resource": "/images/{id}",
+  "path": "/images/1",
   "httpMethod": "GET",
   "isBase64Encoded": false,
   "queryStringParameters": {
     "foo": "bar"
   },
   "pathParameters": {
-    "proxy": "/path/to/resource"
+    "id": "1"
   },
   "stageVariables": {
     "baz": "qux"
@@ -34,6 +34,13 @@
     "X-Forwarded-Proto": "https"
   },
   "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "domingo",
+        "name": "John Doe",
+        "iat": "1516239022"
+      }
+    },
     "accountId": "123456789012",
     "resourceId": "123456",
     "stage": "prod",

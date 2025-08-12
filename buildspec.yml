@@ -2,6 +2,24 @@ version: 0.2
 phases:
   install:
     runtime-versions:
+      nodejs: 18.x
+    commands:
+      - cd layers/dependencies
+      - pip install -r requirements.txt
+  pre_build:
+    commands:
+      - npm prune --production
+  build:
+    commands:
+      - aws cloudformation package --template template.yaml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-1jzba95imlkz8 --output-template packaged.yml
+artifacts:
+  type: zip
+  files:
+    - packaged.yml
+version: 0.2
+phases:
+  install:
+    runtime-versions:
       python: 3.13
     commands:
       - pip install aws-sam-cli

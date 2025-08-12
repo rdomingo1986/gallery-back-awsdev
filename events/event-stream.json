@@ -1,0 +1,38 @@
+{
+  "Records": [
+    {
+      "eventID": "1",
+      "eventName": "REMOVE",
+      "eventVersion": "1.1",
+      "eventSource": "aws:dynamodb",
+      "awsRegion": "us-east-1",
+      "dynamodb": {
+        "Keys": {
+          "UserId": {
+            "S": "domingo"
+          },
+          "ImageId": {
+            "S": "image123"
+          }
+        },
+        "OldImage": {
+          "UserId": {
+            "S": "domingo"
+          },
+          "ImageId": {
+            "S": "image123"
+          },
+          "ImageUrl": {
+            "S": "https://sam-app-imagesbucket-wchgkfkdxgr3.s3.us-west-2.amazonaws.com/domingo/test.jpeg"
+          },
+          "Description": {
+            "S": "Test image description"
+          }
+        },
+        "SequenceNumber": "111",
+        "SizeBytes": 26,
+        "StreamViewType": "OLD_IMAGE"
+      }
+    }
+  ]
+}
