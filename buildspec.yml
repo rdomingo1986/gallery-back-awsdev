@@ -8,13 +8,9 @@ phases:
       - pip install aws-sam-cli
   pre_build:
     commands:
-      - cd layers/dependencies
-      - mkdir -p python
-      - pip install -r requirements.txt -t python/ --upgrade
-      - cd ../..
+      - sam build --use-container
   build:
     commands:
-      - sam build --use-container
       - sam package --s3-bucket codepipeline-us-west-2-191184544132 --output-template-file packaged.yaml
 artifacts:
   files:
