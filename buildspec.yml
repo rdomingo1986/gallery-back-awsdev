@@ -15,7 +15,7 @@ phases:
   build:
     commands:
       - sam build --use-container
-      - sam package --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-1jzba95imlkz8 --output-template-file packaged.yaml
+      - sam package --s3-bucket codepipeline-us-west-2-191184544132 --output-template-file packaged.yaml
 artifacts:
   files:
     - packaged.yaml
