@@ -8,8 +8,12 @@ from api_utils import api_response
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
+if os.environ.get('ENV') == 'LOCAL':
+    dynamodb = boto3.resource('dynamodb', endpoint_url='http://172.17.0.2:8000')
+    table = dynamodb.Table(os.environ['DYNAMODB_LOCAL'])
+else:
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 
 def lambda_handler(event, context):
     try:
