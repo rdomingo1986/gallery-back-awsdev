@@ -225,3 +225,19 @@ Outputs:
   SetPermanentPasswordCommand:
     Description: "AWS CLI command to set permanent password for user"
     Value: !Sub "aws cognito-idp admin-set-user-password --user-pool-id ${GalleryUserPool} --username <USERNAME> --password <PERMANENT_PASSWORD> --permanent"
+
+  GetTokenCommand:
+    Description: "AWS CLI command to get access token"
+    Value: !Sub "aws cognito-idp initiate-auth --auth-flow USER_PASSWORD_AUTH --client-id ${GalleryUserPoolClient} --auth-parameters USERNAME=<USERNAME>,PASSWORD=<PASSWORD> --query \"AuthenticationResult.IdToken\""
+
+  ImagesBucketName:
+    Description: "S3 bucket name for images"
+    Value: !Ref ImagesBucket
+
+  CognitoUserPoolId:
+    Description: "Cognito User Pool ID"
+    Value: !Ref GalleryUserPool
+
+  CognitoClientId:
+    Description: "Cognito Client ID"
+    Value: !Ref GalleryUserPoolClient
