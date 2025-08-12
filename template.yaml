@@ -11,6 +11,9 @@ Globals:
     Architectures:
       - x86_64
     Runtime: python3.13
+    Environment:
+      Variables:
+        DYNAMODB_TABLE: !Ref ImageMetadataTable
     Layers:
       - !Ref DependenciesLayer
     Tracing: Active
